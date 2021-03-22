@@ -1,0 +1,279 @@
+import time
+
+class TreeNode(object):
+    def __init__(self, val,vert):
+        self.val = val
+        self.vert = vert
+        self.left = None
+        self.right = None
+        self.height = 1
+        self.vertice = None
+
+class AVL_Tree(object):
+
+    # Recursive function to insert key in
+    # subtree rooted with node and returns
+    # new root of subtree.
+    def insert(self, root, key, vert):
+
+        # Step 1 - Perform normal BST
+        if not root:
+            return TreeNode(key,vert)
+        elif key < root.val:
+            root.left = self.insert(root.left, key,vert)
+        else:
+            root.right = self.insert(root.right, key,vert)
+
+
+        #print(TreeNode(key).left)
+
+            # Step 2 - Update the height of the
+        # ancestor node
+        root.height = 1 + max(self.getHeight(root.left),
+                              self.getHeight(root.right))
+
+        # Step 3 - Get the balance factor
+        balance = self.getBalance(root)
+
+        # Step 4 - If the node is unbalanced,
+        # then try out the 4 cases
+        # Case 1 - Left Left
+        if balance > 1 and key < root.left.val:
+            return self.rightRotate(root)
+
+            # Case 2 - Right Right
+        if balance < -1 and key > root.right.val:
+            return self.leftRotate(root)
+
+            # Case 3 - Left Right
+        if balance > 1 and key > root.left.val:
+            root.left = self.leftRotate(root.left)
+            return self.rightRotate(root)
+
+            # Case 4 - Right Left
+        if balance < -1 and key < root.right.val:
+            root.right = self.rightRotate(root.right)
+            return self.leftRotate(root)
+
+
+        return root
+
+    def makeDict(self,root):
+        root_dict[root.vert] = root.val
+
+        return root_dict
+
+    def leftRotate(self, z):
+
+        y = z.right
+        T2 = y.left
+
+        # Perform rotation
+        y.left = z
+        z.right = T2
+
+        # Update heights
+        z.height = 1 + max(self.getHeight(z.left),
+                           self.getHeight(z.right))
+        y.height = 1 + max(self.getHeight(y.left),
+                           self.getHeight(y.right))
+
+        # Return the new root
+        return y
+
+    def rightRotate(self, z):
+
+        y = z.left
+        T3 = y.right
+
+        # Perform rotation
+        y.right = z
+        z.left = T3
+
+        # Update heights
+        z.height = 1 + max(self.getHeight(z.left),
+                           self.getHeight(z.right))
+        y.height = 1 + max(self.getHeight(y.left),
+                           self.getHeight(y.right))
+
+        # Return the new root
+        return y
+
+    def getHeight(self, root):
+        if not root:
+            return 0
+
+        return root.height
+
+    def getBalance(self, root):
+        if not root:
+            return 0
+
+        return self.getHeight(root.left) - self.getHeight(root.right)
+
+    def getMinValueNode(self, root):
+        if root is None or root.left is None:
+            return root
+
+        return self.getMinValueNode(root.left)
+
+    def preOrder(self, root):
+
+        if not root:
+            return
+
+        print("{0} ".format(root.val), end="")
+        #print(root.vert)
+        self.preOrder(root.left)
+        self.preOrder(root.right)
+
+    def find(self,root,vert):
+        if not root:
+            return
+
+        if root.vert == vert:
+            self.vertice = root.val
+
+
+        self.find(root.left,vert)
+        self.find(root.right,vert)
+
+
+
+
+    def minValue(self,root):
+        current = root
+
+        # loop down to find the lefmost leaf
+        while (current.left is not None):
+            current = current.left
+
+        return current.val, current.vert
+
+
+
+    def delete(self, root, key,vert):
+
+        # Step 1 - Perform standard BST delete
+        if not root:
+            return root
+
+        elif key < root.val:
+            root.left = self.delete(root.left, key,vert)
+
+        elif key > root.val:
+            root.right = self.delete(root.right, key,vert)
+
+        else:
+            if root.left is None:
+                temp = root.right
+                root = None
+                return temp
+
+            elif root.right is None:
+                temp = root.left
+                root = None
+                return temp
+
+            temp = self.getMinValueNode(root.right)
+
+            root.val = temp.val
+            root.right = self.delete(root.right,
+                                     temp.val,vert)
+
+        return root
+
+
+#Inicializando a avore AVL:
+
+
+myTree = AVL_Tree()
+root = None
+
+
+#numeros de vertices a serem usados do arquivo de chicago 'graphs.rtf'
+
+
+instacias = [2956,5000,8000,10000,15000]
+
+
+
+#Criando o grafo para cada uma das instancias:
+
+for i in instacias:
+    with open('graphs.rtf', "r") as f:
+        data = f.read()
+
+    data = (data.splitlines())
+
+    n = len(data)
+
+    adjList=[[]]*(i+1)
+
+    for line in data[0:i]:
+        line = line.split(' ')
+        k = int(line[0])
+        line[2] = int(line[2])
+        adjList[k]= adjList[k] + [(line[1],line[2])]
+
+    soma_arestas = 0
+    for idx,a in enumerate(adjList):
+        soma_arestas = soma_arestas + len(adjList[idx])
+
+    #print(adjList[1])
+
+
+    #Com o grafo pronto, vamos inicializar o Dijkstra
+
+    start = time.time()
+
+    n = len(adjList)
+    visited = [False] * n
+    distances = [float('inf')]*n
+    entry_lookup = {}
+    parents = {}
+    starting_vertex = '1'
+    distances[int(starting_vertex)] = 0
+
+
+    #inserindo o nó inicial com diastancia = 0 na AVL
+    root = myTree.insert(root, 0,starting_vertex)
+
+    #controlador de vertice, que sera reduzido toda vez que um vértice for processado
+    l = i
+
+
+    while l>0:
+
+        current_distance, current_vertex = myTree.minValue(root)
+        visited[int(current_vertex)] = True
+
+        for (neighbor, cost) in adjList[int(current_vertex)]:
+
+            if not visited[int(neighbor)]:
+                distance = current_distance + cost
+
+                if current_distance + cost < distances[int(neighbor)]:
+                    distances[int(neighbor)] = distance
+                    parents[neighbor] = current_vertex
+                    root = myTree.insert(root, current_distance + cost, str(neighbor))
+
+
+        if root.right or root.left:
+            root = myTree.delete(root, current_distance,current_vertex)
+        else:
+            #print('Distancias',distances[1:])
+            break
+        l = l-1
+
+    end = time.time()
+
+    tempo = round(end - start, 8)
+
+
+    print('Num de Vertices',i)
+    print('Num arestas ',soma_arestas)
+    print('tempo', tempo)
+
+
+    #print('Distancias',distances[1:])
