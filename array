@@ -1,0 +1,124 @@
+import time
+
+######################
+
+#Esse arquivo coloca os grafos do DIMACS em dicionario e roda o dijkstra para avalair o run time com vetor.
+
+######################
+
+
+# funcao do decrease Key
+def find_lowest_cost_node(costs):
+    lowest_cost = float("inf")
+    lowest_cost_node = None
+    # Go through each node.
+    for node in costs:
+        cost = costs[node]
+        # If it's the lowest cost so far and hasn't been processed yet...
+        if cost < lowest_cost and node not in processed:
+            # ... set it as the new lowest-cost node.
+            lowest_cost = cost
+            lowest_cost_node = node
+    #print('lowest_cost_node: ',lowest_cost_node)
+    return lowest_cost_node
+
+
+
+# Instancias de Sao Francisco
+
+inputs = [19221,23360,31678,77829]
+
+
+
+# Leitura do arquivo DIMACS e colocacao dele em um vetor
+for i in inputs:
+    with open("graphs_bay.rtf", "r") as f:
+        data = f.read()
+
+    data = (data.splitlines())
+    co = 0
+    ini = 1
+    nodes = []
+    e_graph = {}
+    for line in data[0:i]:
+        line = line.split(' ')
+        line[2] = int(line[2])
+        if line[0] not in e_graph:
+            e_graph[line[0]] = {line[1]: line[2]}
+        else:
+            e_graph[line[0]].update({line[1]: line[2]})
+
+    soma_arestas = 0
+    for k,v in e_graph.items():
+        soma_arestas = soma_arestas + len(e_graph[k])
+
+
+
+    #Inicio do Dijkstra
+
+    start = time.time()
+
+
+    starting_vertex = '16'
+
+    #insercao em Q
+    costs = {vertex: float('infinity') for vertex in e_graph}
+    costs[starting_vertex] = 0
+
+
+    parents = {}
+    path =[]
+    processed = []
+
+
+
+    # extraindo o minimo
+    node = find_lowest_cost_node(costs)
+
+
+    while node is not None:
+        cost = costs[node]
+        # Go through all the neighbors of this node.
+        neighbors = e_graph[node]
+        for n in neighbors.keys():
+
+
+            # The relaxation Step Start
+            new_cost = cost + neighbors[n]
+            if costs[n] > new_cost:
+                # ... update the cost for this node.
+                costs[n] = new_cost
+                # This node becomes the new parent for this neighbor.
+                parents[n] = node
+
+            # The relaxation Step Ends
+
+        # Mark the node as processed.
+        processed.append(node)
+        #print(len(processed))
+        # Find the next node to process, and loop.
+        node = find_lowest_cost_node(costs)
+
+    end = time.time()
+
+    #target = '17'
+    #path.append(target)
+
+    #if target in parents:
+        #while path[0]!= starting_vertex:
+            #path.insert(0, parents[path[0]])
+    #else:
+        #print('There is no path from ',starting_vertex,'and ',target)
+
+
+
+
+    tempo = round(end - start,4)
+
+    print('Vertices',i)
+    print('arestas',soma_arestas)
+    print(tempo)
+
+
+
+
