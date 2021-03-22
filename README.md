@@ -9,5 +9,7 @@ Data structures:
 - Binary min heap
 - Array
 - Finabocci heap
+- AVL Tree
+
 
 
