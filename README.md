@@ -12,4 +12,6 @@ Data structures:
 - AVL Tree
 
 
+![grafico Array Dijkstrajpeg](https://user-images.githubusercontent.com/33058987/113934402-16687880-97cc-11eb-947e-64ed08e089da.jpeg)
+![grafico dijkstra min heap](https://user-images.githubusercontent.com/33058987/113934414-18cad280-97cc-11eb-9cf8-4e43cf513cc6.jpeg)
 
